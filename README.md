@@ -4,6 +4,8 @@ O que é uma API RESTful?
 
 Deferença entre API E WebService?
 
+https://www.udemy.com/course/rest-apis-com-python-e-flask/
+
 Utilizando Python na versão 3.8.10
 
 Criar um ambiente virtual:

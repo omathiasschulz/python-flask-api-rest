@@ -1,6 +1,6 @@
 """Imports
 """
-from flask_restful import Resource
+from flask_restful import Resource, reqparse
 
 
 hoteis = [
@@ -47,6 +47,28 @@ class Hotel(Resource):
     """Hotel class
     """
 
+    args = reqparse.RequestParser()
+    # argumentos permitidos
+    args.add_argument('nome')
+    args.add_argument('estrelas')
+    args.add_argument('diaria')
+    args.add_argument('cidade')
+
+    def find_hotel(self, hotel_id):
+        """Método que retorna um hotel pelo ID
+
+        Args:
+            hotel_id (string): ID do hotel para retornar
+
+        Returns:
+            dict: Hotel encontrado ou None
+        """
+        for hotel in hoteis:
+            if hotel['id'] == hotel_id:
+                return hotel
+
+        return None
+
     def get(self, hotel_id):
         """Método GET que retorna um hotel pelo ID
 
@@ -56,10 +78,44 @@ class Hotel(Resource):
         Returns:
             dict: Hotel encontrado
         """
-        for hotel in hoteis:
-            if hotel['id'] == hotel_id:
-                return hotel
-
+        hotel = self.find_hotel(hotel_id)
+        if hotel:
+            return hotel
         return {
             'message': 'Hotel não encontrado'
         }, 404  # HTTP Status CODE: Not Found
+
+    def post(self, hotel_id):
+        """Método POST que cadastra um novo hotel
+
+        Args:
+            hotel_id (string): ID do hotel para cadastrar
+
+        Returns:
+            dict: Hotel encontrado
+        """
+        dados = self.args.parse_args()
+        novo_hotel = {'id': hotel_id, **dados}
+        hoteis.append(novo_hotel)
+
+        return novo_hotel, 201  # HTTP Status CODE: Success
+
+    def put(self, hotel_id):
+        """Método PUT para alterar um hotel
+
+        Args:
+            hotel_id (string): ID do hotel para cadastrar
+
+        Returns:
+            dict: Hotel encontrado
+        """
+        dados = self.args.parse_args()
+        novo_hotel = {'id': hotel_id, **dados}
+
+        hotel = self.find_hotel(hotel_id)
+        if hotel:
+            hotel.update(novo_hotel)
+            return novo_hotel, 200  # HTTP Status CODE: Success
+
+        hoteis.append(novo_hotel)
+        return novo_hotel, 201  # HTTP Status CODE: Created
