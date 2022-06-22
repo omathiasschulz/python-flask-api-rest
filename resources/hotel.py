@@ -1,7 +1,7 @@
-"""Imports
+"""Resources
 """
 from flask_restful import Resource, reqparse
-
+from models.hotel import HotelModel
 
 hoteis = [
     {
@@ -95,7 +95,9 @@ class Hotel(Resource):
             dict: Hotel encontrado
         """
         dados = self.args.parse_args()
-        novo_hotel = {'id': hotel_id, **dados}
+        novo_hotel = HotelModel(hotel_id, **dados)
+        # é um objeto e converte para json/dict
+        novo_hotel = novo_hotel.to_json()
         hoteis.append(novo_hotel)
 
         return novo_hotel, 201  # HTTP Status CODE: Success
@@ -110,7 +112,9 @@ class Hotel(Resource):
             dict: Hotel encontrado
         """
         dados = self.args.parse_args()
-        novo_hotel = {'id': hotel_id, **dados}
+        novo_hotel = HotelModel(hotel_id, **dados)
+        # é um objeto e converte para json/dict
+        novo_hotel = novo_hotel.to_json()
 
         hotel = self.find_hotel(hotel_id)
         if hotel:
