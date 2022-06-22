@@ -119,3 +119,19 @@ class Hotel(Resource):
 
         hoteis.append(novo_hotel)
         return novo_hotel, 201  # HTTP Status CODE: Created
+
+    def delete(self, hotel_id):
+        """Método DELETE para deletar um hotel
+
+        Args:
+            hotel_id (string): ID do hotel para deletar
+
+        Returns:
+            dict: Hotel encontrado
+        """
+        global hoteis
+        hoteis = [hotel for hotel in hoteis if hotel['id'] != hotel_id]
+
+        return {
+            'message': 'Hotel removido'
+        }, 200  # HTTP Status CODE: Not Found
