@@ -49,8 +49,8 @@ class Hotel(Resource):
 
     args = reqparse.RequestParser()
     # argumentos permitidos
-    args.add_argument('nome')
-    args.add_argument('estrelas')
+    args.add_argument('nome', type=str, required=True, help="Campo nome obrigatório!")
+    args.add_argument('estrelas', type=float, required=True, help="Campo estrelas obrigatório!")
     args.add_argument('diaria')
     args.add_argument('cidade')
 
@@ -84,8 +84,10 @@ class Hotel(Resource):
 
         dados = self.args.parse_args()
         hotel = HotelModel(hotel_id, **dados)
-        hotel.save_hotel()
-
+        try:
+            hotel.save_hotel()
+        except:
+            return { 'message': 'Falha ao salvar hotel!' }, 500
         return hotel.to_json(), 201  # HTTP Status CODE: Success
 
     def put(self, hotel_id):
@@ -107,7 +109,10 @@ class Hotel(Resource):
 
         # se não foi encontrado, cria o hotel
         hotel = HotelModel(hotel_id, **dados)
-        hotel.save_hotel()
+        try:
+            hotel.save_hotel()
+        except:
+            return { 'message': 'Falha ao salvar hotel!' }, 500
         return hotel.to_json(), 201  # HTTP Status CODE: Created
 
     def delete(self, hotel_id):
@@ -121,7 +126,10 @@ class Hotel(Resource):
         """
         hotel = HotelModel.find_hotel(hotel_id)
         if hotel:
-            hotel.delete_hotel()
+            try:
+                hotel.delete_hotel()
+            except:
+                return { 'message': 'Falha ao deletar hotel!' }, 500
             return {
                 'message': 'Hotel removido'
             }, 200
