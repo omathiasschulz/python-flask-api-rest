@@ -39,7 +39,7 @@ class Hoteis(Resource):
             dict: Todos os hoteis cadastrados
         """
         return {
-            'hoteis': hoteis,
+            'hoteis': [hotel.to_json() for hotel in HotelModel.query.all()],
         }
 
 
@@ -54,21 +54,6 @@ class Hotel(Resource):
     args.add_argument('diaria')
     args.add_argument('cidade')
 
-    def find_hotel(self, hotel_id):
-        """Método que retorna um hotel pelo ID
-
-        Args:
-            hotel_id (string): ID do hotel para retornar
-
-        Returns:
-            dict: Hotel encontrado ou None
-        """
-        for hotel in hoteis:
-            if hotel['id'] == hotel_id:
-                return hotel
-
-        return None
-
     def get(self, hotel_id):
         """Método GET que retorna um hotel pelo ID
 
@@ -78,9 +63,9 @@ class Hotel(Resource):
         Returns:
             dict: Hotel encontrado
         """
-        hotel = self.find_hotel(hotel_id)
+        hotel = HotelModel.find_hotel(hotel_id)
         if hotel:
-            return hotel
+            return hotel.to_json()
         return {
             'message': 'Hotel não encontrado'
         }, 404  # HTTP Status CODE: Not Found
@@ -94,13 +79,14 @@ class Hotel(Resource):
         Returns:
             dict: Hotel encontrado
         """
-        dados = self.args.parse_args()
-        novo_hotel = HotelModel(hotel_id, **dados)
-        # é um objeto e converte para json/dict
-        novo_hotel = novo_hotel.to_json()
-        hoteis.append(novo_hotel)
+        if HotelModel.find_hotel(hotel_id):
+            return { 'message': "Hotel ID {} já existe".format(hotel_id) }, 400
 
-        return novo_hotel, 201  # HTTP Status CODE: Success
+        dados = self.args.parse_args()
+        hotel = HotelModel(hotel_id, **dados)
+        hotel.save_hotel()
+
+        return hotel.to_json(), 201  # HTTP Status CODE: Success
 
     def put(self, hotel_id):
         """Método PUT para alterar um hotel
@@ -112,17 +98,17 @@ class Hotel(Resource):
             dict: Hotel encontrado
         """
         dados = self.args.parse_args()
-        novo_hotel = HotelModel(hotel_id, **dados)
-        # é um objeto e converte para json/dict
-        novo_hotel = novo_hotel.to_json()
 
-        hotel = self.find_hotel(hotel_id)
+        hotel = HotelModel.find_hotel(hotel_id)
         if hotel:
-            hotel.update(novo_hotel)
-            return novo_hotel, 200  # HTTP Status CODE: Success
+            hotel.update_hotel(**dados)
+            hotel.save_hotel()
+            return hotel.to_json(), 200  # HTTP Status CODE: Success
 
-        hoteis.append(novo_hotel)
-        return novo_hotel, 201  # HTTP Status CODE: Created
+        # se não foi encontrado, cria o hotel
+        hotel = HotelModel(hotel_id, **dados)
+        hotel.save_hotel()
+        return hotel.to_json(), 201  # HTTP Status CODE: Created
 
     def delete(self, hotel_id):
         """Método DELETE para deletar um hotel
@@ -133,9 +119,13 @@ class Hotel(Resource):
         Returns:
             dict: Hotel encontrado
         """
-        global hoteis
-        hoteis = [hotel for hotel in hoteis if hotel['id'] != hotel_id]
+        hotel = HotelModel.find_hotel(hotel_id)
+        if hotel:
+            hotel.delete_hotel()
+            return {
+                'message': 'Hotel removido'
+            }, 200
 
         return {
-            'message': 'Hotel removido'
-        }, 200  # HTTP Status CODE: Not Found
+            'message': 'Hotel não encontrato'
+        }, 404
