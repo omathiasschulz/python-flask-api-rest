@@ -1,7 +1,16 @@
 """Resources
 """
+from flask_jwt_extended import create_access_token
+from werkzeug.security import safe_str_cmp
 from flask_restful import Resource, reqparse
 from models.usuario import UsuarioModel
+
+
+args = reqparse.RequestParser()
+args.add_argument('login', type=str, required=True,
+                  help="Campo login obrigatório!")
+args.add_argument('senha', type=str, required=True,
+                  help="Campo senha obrigatório!")
 
 
 class Usuario(Resource):
@@ -55,9 +64,6 @@ class UsuarioRegistro(Resource):
     def post(self):
         """Método responsável por cadastrar um novo usuário
         """
-        args = reqparse.RequestParser()
-        args.add_argument('login', type=str, required=True, help="Campo login obrigatório!")
-        args.add_argument('senha', type=str, required=True, help="Campo senha obrigatório!")
         dados = args.parse_args()
 
         # valida de ja existe o usuário
@@ -67,3 +73,22 @@ class UsuarioRegistro(Resource):
         usuario = UsuarioModel(**dados)
         usuario.save_usuario()
         return {'message': 'Cadastro realizado com sucesso!'}, 201
+
+
+class UsuarioLogin(Resource):
+    """UsuarioLogin class
+    """
+
+    @classmethod
+    def post(cls):
+        """Método responsável pelo login de um usuário
+        """
+        dados = args.parse_args()
+
+        usuario = UsuarioModel.find_by_login(dados['login'])
+
+        if usuario and safe_str_cmp(usuario.senha, dados['senha']):
+            token = create_access_token(identity=usuario.usuario_id)
+            return {'access_token': token}, 200
+
+        return {'message': 'Login ou senha incorreto!'}, 401
