@@ -2,6 +2,7 @@
 """
 from flask_jwt_extended import create_access_token
 from werkzeug.security import safe_str_cmp
+from flask_jwt_extended import jwt_required
 from flask_restful import Resource, reqparse
 from models.usuario import UsuarioModel
 
@@ -33,6 +34,7 @@ class Usuario(Resource):
             'message': 'Usuário não encontrado'
         }, 404  # HTTP Status CODE: Not Found
 
+    @jwt_required()
     def delete(self, usuario_id):
         """Método DELETE para deletar um usuario
 

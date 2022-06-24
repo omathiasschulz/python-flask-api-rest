@@ -1,5 +1,6 @@
 """Resources
 """
+from flask_jwt_extended import jwt_required
 from flask_restful import Resource, reqparse
 from models.hotel import HotelModel
 
@@ -48,6 +49,7 @@ class Hotel(Resource):
             'message': 'Hotel não encontrado'
         }, 404  # HTTP Status CODE: Not Found
 
+    @jwt_required()
     def post(self, hotel_id):
         """Método POST que cadastra um novo hotel
 
@@ -68,6 +70,7 @@ class Hotel(Resource):
             return {'message': 'Falha ao salvar hotel!'}, 500
         return hotel.to_json(), 201  # HTTP Status CODE: Success
 
+    @jwt_required()
     def put(self, hotel_id):
         """Método PUT para alterar um hotel
 
@@ -93,6 +96,7 @@ class Hotel(Resource):
             return {'message': 'Falha ao salvar hotel!'}, 500
         return hotel.to_json(), 201  # HTTP Status CODE: Created
 
+    @jwt_required()
     def delete(self, hotel_id):
         """Método DELETE para deletar um hotel
 
