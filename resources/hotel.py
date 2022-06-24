@@ -3,30 +3,6 @@
 from flask_restful import Resource, reqparse
 from models.hotel import HotelModel
 
-hoteis = [
-    {
-        'id': '1',
-        'nome': 'Schulz Hotel',
-        'estrelas': 4.3,
-        'diaria': 420.34,
-        'cidade': 'Ibirama',
-    },
-    {
-        'id': '2',
-        'nome': 'Schulz Hotel Filial 01',
-        'estrelas': 5,
-        'diaria': 480.99,
-        'cidade': 'Rio do Sul',
-    },
-    {
-        'id': '3',
-        'nome': 'Schulz Hotel Filial 02',
-        'estrelas': 4.3,
-        'diaria': 320.34,
-        'cidade': 'Ituporanga',
-    },
-]
-
 
 class Hoteis(Resource):
     """Hoteis class
@@ -49,8 +25,10 @@ class Hotel(Resource):
 
     args = reqparse.RequestParser()
     # argumentos permitidos
-    args.add_argument('nome', type=str, required=True, help="Campo nome obrigatório!")
-    args.add_argument('estrelas', type=float, required=True, help="Campo estrelas obrigatório!")
+    args.add_argument('nome', type=str, required=True,
+                      help="Campo nome obrigatório!")
+    args.add_argument('estrelas', type=float, required=True,
+                      help="Campo estrelas obrigatório!")
     args.add_argument('diaria')
     args.add_argument('cidade')
 
@@ -80,14 +58,14 @@ class Hotel(Resource):
             dict: Hotel encontrado
         """
         if HotelModel.find_hotel(hotel_id):
-            return { 'message': "Hotel ID {} já existe".format(hotel_id) }, 400
+            return {'message': "Hotel ID {} já existe".format(hotel_id)}, 400
 
         dados = self.args.parse_args()
         hotel = HotelModel(hotel_id, **dados)
         try:
             hotel.save_hotel()
         except:
-            return { 'message': 'Falha ao salvar hotel!' }, 500
+            return {'message': 'Falha ao salvar hotel!'}, 500
         return hotel.to_json(), 201  # HTTP Status CODE: Success
 
     def put(self, hotel_id):
@@ -112,7 +90,7 @@ class Hotel(Resource):
         try:
             hotel.save_hotel()
         except:
-            return { 'message': 'Falha ao salvar hotel!' }, 500
+            return {'message': 'Falha ao salvar hotel!'}, 500
         return hotel.to_json(), 201  # HTTP Status CODE: Created
 
     def delete(self, hotel_id):
@@ -129,11 +107,11 @@ class Hotel(Resource):
             try:
                 hotel.delete_hotel()
             except:
-                return { 'message': 'Falha ao deletar hotel!' }, 500
+                return {'message': 'Falha ao deletar hotel!'}, 500
             return {
                 'message': 'Hotel removido'
             }, 200
 
         return {
-            'message': 'Hotel não encontrato'
+            'message': 'Hotel não encontrado'
         }, 404
