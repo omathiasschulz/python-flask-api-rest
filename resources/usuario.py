@@ -2,8 +2,9 @@
 """
 from flask_jwt_extended import create_access_token
 from werkzeug.security import safe_str_cmp
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import jwt_required, get_jwt
 from flask_restful import Resource, reqparse
+from blacklist import BLACKLIST
 from models.usuario import UsuarioModel
 
 
@@ -94,3 +95,17 @@ class UsuarioLogin(Resource):
             return {'access_token': token}, 200
 
         return {'message': 'Login ou senha incorreto!'}, 401
+
+
+class UsuarioLogout(Resource):
+    """UsuarioLogout class
+    """
+
+    @jwt_required()
+    def post(self):
+        """Método responsável pelo logout de um usuário
+        """
+        jwt_id = get_jwt()['jti']  # JWT Token Identifier
+        BLACKLIST.add(jwt_id)
+
+        return {'message': 'Logout realizado com sucesso!'}, 200

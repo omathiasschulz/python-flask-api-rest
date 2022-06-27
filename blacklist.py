@@ -1,0 +1,4 @@
+"""Blacklist
+"""
+
+BLACKLIST = set()
