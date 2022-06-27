@@ -38,13 +38,15 @@ def verifica_blacklist(self, token):
 
 
 @jwt.revoked_token_loader
-def token_acesso_invalidado():
-    """Método responsável por retornar uma mensagem que logout foi realizado
+def token_acesso_invalidado(jwt_header, jwt_payload):
+    """Método responsável por retornar uma mensagem de erro quando usuário está deslogado
+    e tentou acessar uma rotina que deve estar logado
 
     Returns:
         string: String no padrão JSON
     """
-    return jsonify({'message': 'Sucesso no logout'}), 401
+    print('passou')
+    return jsonify({'message': 'Você deve estar logado para realizar essa operação!'}), 401
 
 
 api.add_resource(Hoteis, '/hoteis')
