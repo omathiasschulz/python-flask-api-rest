@@ -1,8 +1,51 @@
 """Resources
 """
+import sqlite3
 from flask_jwt_extended import jwt_required
 from flask_restful import Resource, reqparse
 from models.hotel import HotelModel
+
+
+def normalize_path_params(
+    cidade=None,
+    estrelas_min=0,
+    estrelas_max=5,
+    diaria_min=0,
+    diaria_max=10000,
+    limit=50,
+    offset=0,
+    **dados
+):
+    """Normaliza os parametros enviados no request
+    """
+    if cidade:
+        return {
+            'cidade': cidade,
+            'estrelas_max': estrelas_max,
+            'estrelas_min': estrelas_min,
+            'diaria_min': diaria_min,
+            'diaria_max': diaria_max,
+            'limit': limit,
+            'offset': offset,
+        }
+    return {
+        'estrelas_max': estrelas_max,
+        'estrelas_min': estrelas_min,
+        'diaria_min': diaria_min,
+        'diaria_max': diaria_max,
+        'limit': limit,
+        'offset': offset,
+    }
+
+
+path_params = reqparse.RequestParser()
+path_params.add_argument('cidade', type=str)
+path_params.add_argument('estrelas_min', type=float)
+path_params.add_argument('estrelas_max', type=float)
+path_params.add_argument('diaria_min', type=float)
+path_params.add_argument('diaria_max', type=float)
+path_params.add_argument('limit', type=float)
+path_params.add_argument('offset', type=float)
 
 
 class Hoteis(Resource):
@@ -15,8 +58,51 @@ class Hoteis(Resource):
         Returns:
             dict: Todos os hoteis cadastrados
         """
+        connection = sqlite3.connect('banco.database')
+        cursor = connection.cursor()
+
+        dados = path_params.parse_args()
+        dados_validos = {chave: dados[chave]
+                         for chave in dados if dados[chave] is not None}
+
+        parametros = normalize_path_params(**dados_validos)
+
+        print('parametros')
+        print(parametros)
+
+        if not parametros.get('cidade'):
+            consulta = 'select * from hoteis \
+                where (estrelas > ? and estrelas < ?) \
+                and (diaria > ? and diaria < ?) \
+                limit ? offset ?'
+        else:
+            consulta = 'select * from hoteis \
+                where (estrelas > ? and estrelas < ?) \
+                and (diaria > ? and diaria < ?) \
+                and cidade = ? \
+                limit ? offset ?'
+
+        # pega os valores sem chave
+        data = tuple([parametros[chave] for chave in parametros])
+        resultado = cursor.execute(consulta, data)
+
+        print('resultado')
+        print(resultado)
+
+        hoteis = []
+        for linha in resultado:
+            print('linha')
+            print(linha)
+            hoteis.append({
+                'hotel_id': linha[0],
+                'nome': linha[1],
+                'estrelas': linha[2],
+                'diaria': linha[3],
+                'cidade': linha[4],
+            })
+
         return {
-            'hoteis': [hotel.to_json() for hotel in HotelModel.query.all()],
+            'hoteis': hoteis,
         }
 
 
