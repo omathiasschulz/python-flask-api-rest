@@ -29,7 +29,7 @@ class SiteModel(banco.Model):
         return {
             'site_id': self.site_id,
             'url': self.url,
-            'hoteis': [hotel.json() for hotel in self.hoteis],
+            'hoteis': [hotel.to_json() for hotel in self.hoteis],
         }
 
     @classmethod
@@ -44,6 +44,18 @@ class SiteModel(banco.Model):
             return site
         return None
 
+    @classmethod
+    def find_by_id(cls, site_id):
+        """Método responsável por buscar um site
+
+        Args:
+            site_id (string): ID do site
+        """
+        site = cls.query.filter_by(site_id=site_id).first()
+        if site:
+            return site
+        return None
+
     def save_site(self):
         """Método responsável por salvar um novo site
         """
@@ -53,5 +65,8 @@ class SiteModel(banco.Model):
     def delete_site(self):
         """Método responsável por remover um site
         """
+        # deleta os hoteis antes de deletar o site
+        [hotel.delete_hotel() for hotel in self.hoteis]
+
         banco.session.delete(self)
         banco.session.commit()

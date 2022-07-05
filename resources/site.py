@@ -17,7 +17,7 @@ class Sites(Resource):
         """
 
         return {
-            'sites': [site.json() for site in SiteModel.query.all()],
+            'sites': [site.to_json() for site in SiteModel.query.all()],
         }
 
 
@@ -36,7 +36,7 @@ class Site(Resource):
         """
         site = SiteModel.find_site(url)
         if site:
-            return site.json()
+            return site.to_json()
         return {
             'message': 'Site não encontrado'
         }, 404  # HTTP Status CODE: Not Found
@@ -59,7 +59,7 @@ class Site(Resource):
             site.save_site()
         except:
             return {'message': 'Falha ao salvar site!'}, 500
-        return site.json(), 201  # HTTP Status CODE: Success
+        return site.to_json(), 201  # HTTP Status CODE: Success
 
     @jwt_required()
     def delete(self, url):

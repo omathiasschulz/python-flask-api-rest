@@ -4,6 +4,7 @@ import sqlite3
 from flask_jwt_extended import jwt_required
 from flask_restful import Resource, reqparse
 from models.hotel import HotelModel
+from models.site import SiteModel
 from resources.filtros import normalize_path_params, CONSULTA_SEM_CIDADE, CONSULTA_COM_CIDADE
 
 path_params = reqparse.RequestParser()
@@ -54,6 +55,7 @@ class Hoteis(Resource):
                 'estrelas': linha[2],
                 'diaria': linha[3],
                 'cidade': linha[4],
+                'site_id': linha[5],
             })
 
         return {
@@ -73,6 +75,8 @@ class Hotel(Resource):
                       help="Campo estrelas obrigatório!")
     args.add_argument('diaria')
     args.add_argument('cidade')
+    args.add_argument('site_id', type=int, required=True,
+                      help="Campo obrigatório!")
 
     def get(self, hotel_id):
         """Método GET que retorna um hotel pelo ID
@@ -105,6 +109,10 @@ class Hotel(Resource):
 
         dados = self.args.parse_args()
         hotel = HotelModel(hotel_id, **dados)
+
+        if not SiteModel.find_by_id(dados.get('site_id')):
+            return {'message': 'Site não existe'}, 400
+
         try:
             hotel.save_hotel()
         except:
