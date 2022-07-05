@@ -4,39 +4,7 @@ import sqlite3
 from flask_jwt_extended import jwt_required
 from flask_restful import Resource, reqparse
 from models.hotel import HotelModel
-
-
-def normalize_path_params(
-    cidade=None,
-    estrelas_min=0,
-    estrelas_max=5,
-    diaria_min=0,
-    diaria_max=10000,
-    limit=50,
-    offset=0,
-    **dados
-):
-    """Normaliza os parametros enviados no request
-    """
-    if cidade:
-        return {
-            'estrelas_min': estrelas_min,
-            'estrelas_max': estrelas_max,
-            'diaria_min': diaria_min,
-            'diaria_max': diaria_max,
-            'cidade': cidade,
-            'limit': limit,
-            'offset': offset,
-        }
-    return {
-        'estrelas_min': estrelas_min,
-        'estrelas_max': estrelas_max,
-        'diaria_min': diaria_min,
-        'diaria_max': diaria_max,
-        'limit': limit,
-        'offset': offset,
-    }
-
+from resources.filtros import normalize_path_params, CONSULTA_SEM_CIDADE, CONSULTA_COM_CIDADE
 
 path_params = reqparse.RequestParser()
 path_params.add_argument('cidade', type=str)
@@ -68,17 +36,9 @@ class Hoteis(Resource):
         parametros = normalize_path_params(**dados_validos)
 
         if not parametros.get('cidade'):
-            consulta = 'select * from hoteis \
-                where (estrelas >= ? and estrelas <= ?) \
-                and (diaria >= ? and diaria <= ?) \
-                limit ? offset ? \
-            '
+            consulta = CONSULTA_SEM_CIDADE
         else:
-            consulta = 'select * from hoteis \
-                where (estrelas >= ? and estrelas <= ?) \
-                and (diaria >= ? and diaria <= ?) \
-                and cidade = ? \
-                limit ? offset ?'
+            consulta = CONSULTA_COM_CIDADE
 
         # pega os valores sem chave
         data = tuple(parametros[chave] for chave in parametros)
