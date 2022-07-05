@@ -75,7 +75,7 @@ class Hoteis(Resource):
             '
         else:
             consulta = 'select * from hoteis \
-                where (estrelas >= ? and estrelas =< ?) \
+                where (estrelas >= ? and estrelas <= ?) \
                 and (diaria >= ? and diaria <= ?) \
                 and cidade = ? \
                 limit ? offset ?'
