@@ -20,17 +20,17 @@ def normalize_path_params(
     """
     if cidade:
         return {
-            'cidade': cidade,
-            'estrelas_max': estrelas_max,
             'estrelas_min': estrelas_min,
+            'estrelas_max': estrelas_max,
             'diaria_min': diaria_min,
             'diaria_max': diaria_max,
+            'cidade': cidade,
             'limit': limit,
             'offset': offset,
         }
     return {
-        'estrelas_max': estrelas_max,
         'estrelas_min': estrelas_min,
+        'estrelas_max': estrelas_max,
         'diaria_min': diaria_min,
         'diaria_max': diaria_max,
         'limit': limit,
@@ -67,32 +67,27 @@ class Hoteis(Resource):
 
         parametros = normalize_path_params(**dados_validos)
 
-        print('parametros')
-        print(parametros)
-
         if not parametros.get('cidade'):
             consulta = 'select * from hoteis \
-                where (estrelas > ? and estrelas < ?) \
-                and (diaria > ? and diaria < ?) \
-                limit ? offset ?'
+                where (estrelas >= ? and estrelas <= ?) \
+                and (diaria >= ? and diaria <= ?) \
+                limit ? offset ? \
+            '
         else:
             consulta = 'select * from hoteis \
-                where (estrelas > ? and estrelas < ?) \
-                and (diaria > ? and diaria < ?) \
+                where (estrelas >= ? and estrelas =< ?) \
+                and (diaria >= ? and diaria <= ?) \
                 and cidade = ? \
                 limit ? offset ?'
 
         # pega os valores sem chave
-        data = tuple([parametros[chave] for chave in parametros])
-        resultado = cursor.execute(consulta, data)
+        data = tuple(parametros[chave] for chave in parametros)
 
-        print('resultado')
-        print(resultado)
+        # realiza a consulta
+        resultado = cursor.execute(consulta, data)
 
         hoteis = []
         for linha in resultado:
-            print('linha')
-            print(linha)
             hoteis.append({
                 'hotel_id': linha[0],
                 'nome': linha[1],
