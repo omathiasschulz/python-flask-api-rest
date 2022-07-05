@@ -1,0 +1,57 @@
+"""Models
+"""
+from sql_alchemy import banco
+
+
+class SiteModel(banco.Model):
+    """SiteModel class
+    """
+    __tablename__ = 'sites'
+
+    site_id = banco.Column(banco.Integer, primary_key=True)
+    url = banco.Column(banco.String(80))
+    hoteis = banco.relationship('HotelModel')
+
+    def __init__(self, url):
+        """SiteModel constructor
+
+        Args:
+            url (string): URL do site
+        """
+        self.url = url
+
+    def to_json(self):
+        """Converte o model site para um JSON
+
+        Returns:
+            dict: Site
+        """
+        return {
+            'site_id': self.site_id,
+            'url': self.url,
+            'hoteis': [hotel.json() for hotel in self.hoteis],
+        }
+
+    @classmethod
+    def find_site(cls, url):
+        """Método responsável por buscar um site
+
+        Args:
+            url (string): URL do site
+        """
+        site = cls.query.filter_by(url=url).first()
+        if site:
+            return site
+        return None
+
+    def save_site(self):
+        """Método responsável por salvar um novo site
+        """
+        banco.session.add(self)
+        banco.session.commit()
+
+    def delete_site(self):
+        """Método responsável por remover um site
+        """
+        banco.session.delete(self)
+        banco.session.commit()
