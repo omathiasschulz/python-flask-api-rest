@@ -1,16 +1,14 @@
-"""Models
-"""
 from sql_alchemy import banco
 
 
 class SiteModel(banco.Model):
-    """SiteModel class
-    """
-    __tablename__ = 'sites'
+    """SiteModel class"""
+
+    __tablename__ = "sites"
 
     site_id = banco.Column(banco.Integer, primary_key=True)
     url = banco.Column(banco.String(80))
-    hoteis = banco.relationship('HotelModel')
+    hoteis = banco.relationship("HotelModel")
 
     def __init__(self, url):
         """SiteModel constructor
@@ -27,9 +25,9 @@ class SiteModel(banco.Model):
             dict: Site
         """
         return {
-            'site_id': self.site_id,
-            'url': self.url,
-            'hoteis': [hotel.to_json() for hotel in self.hoteis],
+            "site_id": self.site_id,
+            "url": self.url,
+            "hoteis": [hotel.to_json() for hotel in self.hoteis],
         }
 
     @classmethod
@@ -57,14 +55,12 @@ class SiteModel(banco.Model):
         return None
 
     def save_site(self):
-        """Método responsável por salvar um novo site
-        """
+        """Método responsável por salvar um novo site"""
         banco.session.add(self)
         banco.session.commit()
 
     def delete_site(self):
-        """Método responsável por remover um site
-        """
+        """Método responsável por remover um site"""
         # deleta os hoteis antes de deletar o site
         [hotel.delete_hotel() for hotel in self.hoteis]
 

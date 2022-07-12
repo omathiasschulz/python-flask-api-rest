@@ -1,19 +1,17 @@
-"""Models
-"""
 from sql_alchemy import banco
 
 
 class HotelModel(banco.Model):
-    """HotelModel class
-    """
-    __tablename__ = 'hoteis'
+    """HotelModel class"""
+
+    __tablename__ = "hoteis"
 
     hotel_id = banco.Column(banco.String, primary_key=True)
     nome = banco.Column(banco.String(80))
     estrelas = banco.Column(banco.Float(precision=2))
     diaria = banco.Column(banco.Float(precision=2))
     cidade = banco.Column(banco.String(40))
-    site_id = banco.Column(banco.Integer, banco.ForeignKey('sites.site_id'))
+    site_id = banco.Column(banco.Integer, banco.ForeignKey("sites.site_id"))
 
     def __init__(self, hotel_id, nome, estrelas, diaria, cidade, site_id):
         """HotelModel constructor
@@ -40,12 +38,12 @@ class HotelModel(banco.Model):
             dict: Hotel
         """
         return {
-            'hotel_id': self.hotel_id,
-            'nome': self.nome,
-            'estrelas': self.estrelas,
-            'diaria': self.diaria,
-            'cidade': self.cidade,
-            'site_id': self.site_id,
+            "hotel_id": self.hotel_id,
+            "nome": self.nome,
+            "estrelas": self.estrelas,
+            "diaria": self.diaria,
+            "cidade": self.cidade,
+            "site_id": self.site_id,
         }
 
     @classmethod
@@ -61,21 +59,18 @@ class HotelModel(banco.Model):
         return None
 
     def save_hotel(self):
-        """Método responsável por salvar um novo hotel no database
-        """
+        """Método responsável por salvar um novo hotel no database"""
         banco.session.add(self)
         banco.session.commit()
 
     def update_hotel(self, nome, estrelas, diaria, cidade):
-        """Método responsável por alterar um hotel no database
-        """
+        """Método responsável por alterar um hotel no database"""
         self.nome = nome
         self.estrelas = estrelas
         self.diaria = diaria
         self.cidade = cidade
 
     def delete_hotel(self):
-        """Método responsável por remover um hotel
-        """
+        """Método responsável por remover um hotel"""
         banco.session.delete(self)
         banco.session.commit()

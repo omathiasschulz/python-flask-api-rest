@@ -1,12 +1,10 @@
-"""Models
-"""
 from sql_alchemy import banco
 
 
 class UsuarioModel(banco.Model):
-    """UsuarioModel class
-    """
-    __tablename__ = 'usuarios'
+    """UsuarioModel class"""
+
+    __tablename__ = "usuarios"
 
     usuario_id = banco.Column(banco.Integer, primary_key=True)
     login = banco.Column(banco.String(40))
@@ -29,8 +27,8 @@ class UsuarioModel(banco.Model):
             dict: Usuario
         """
         return {
-            'usuario_id': self.usuario_id,
-            'login': self.login,
+            "usuario_id": self.usuario_id,
+            "login": self.login,
         }
 
     @classmethod
@@ -58,13 +56,11 @@ class UsuarioModel(banco.Model):
         return None
 
     def save_usuario(self):
-        """Método responsável por salvar um usuario
-        """
+        """Método responsável por salvar um usuario"""
         banco.session.add(self)
         banco.session.commit()
 
     def delete_usuario(self):
-        """Método responsável por remover um usuario
-        """
+        """Método responsável por remover um usuario"""
         banco.session.delete(self)
         banco.session.commit()

@@ -1,13 +1,10 @@
-"""Resources
-"""
 from flask_jwt_extended import jwt_required
 from flask_restful import Resource
 from models.site import SiteModel
 
 
 class Sites(Resource):
-    """Sites class
-    """
+    """Sites class"""
 
     def get(self):
         """Método GET que retorna todos os sites existentes
@@ -17,13 +14,12 @@ class Sites(Resource):
         """
 
         return {
-            'sites': [site.to_json() for site in SiteModel.query.all()],
+            "sites": [site.to_json() for site in SiteModel.query.all()],
         }
 
 
 class Site(Resource):
-    """Site class
-    """
+    """Site class"""
 
     def get(self, url):
         """Método GET que retorna um site
@@ -37,9 +33,7 @@ class Site(Resource):
         site = SiteModel.find_site(url)
         if site:
             return site.to_json()
-        return {
-            'message': 'Site não encontrado'
-        }, 404  # HTTP Status CODE: Not Found
+        return {"message": "Site não encontrado"}, 404  # HTTP Status CODE: Not Found
 
     @jwt_required()
     def post(self, url):
@@ -52,13 +46,13 @@ class Site(Resource):
             dict: Site encontrado
         """
         if SiteModel.find_site(url):
-            return {'message': "Site {} já existe".format(url)}, 400
+            return {"message": "Site {} já existe".format(url)}, 400
 
         site = SiteModel(url)
         try:
             site.save_site()
         except:
-            return {'message': 'Falha ao salvar site!'}, 500
+            return {"message": "Falha ao salvar site!"}, 500
         return site.to_json(), 201  # HTTP Status CODE: Success
 
     @jwt_required()
@@ -76,11 +70,7 @@ class Site(Resource):
             try:
                 site.delete_site()
             except:
-                return {'message': 'Falha ao deletar site!'}, 500
-            return {
-                'message': 'Site removido'
-            }, 200
+                return {"message": "Falha ao deletar site!"}, 500
+            return {"message": "Site removido"}, 200
 
-        return {
-            'message': 'Site não encontrado'
-        }, 404
+        return {"message": "Site não encontrado"}, 404
