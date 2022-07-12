@@ -1,3 +1,4 @@
+from email.policy import default
 from sql_alchemy import banco
 
 
@@ -9,16 +10,19 @@ class UsuarioModel(banco.Model):
     usuario_id = banco.Column(banco.Integer, primary_key=True)
     login = banco.Column(banco.String(40))
     senha = banco.Column(banco.String(40))
+    ativado = banco.Column(banco.Boolean, default=False)
 
-    def __init__(self, login, senha):
+    def __init__(self, login, senha, ativado):
         """UsuarioModel constructor
 
         Args:
             login (string): Login do usuário
             senha (float): Senha do usuário
+            ativado (float): Determina se o usuário está ativado ou não
         """
         self.login = login
         self.senha = senha
+        self.ativado = ativado
 
     def to_json(self):
         """Converte o model usuario para um JSON
@@ -29,6 +33,7 @@ class UsuarioModel(banco.Model):
         return {
             "usuario_id": self.usuario_id,
             "login": self.login,
+            "ativado": self.ativado,
         }
 
     @classmethod

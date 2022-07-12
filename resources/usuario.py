@@ -9,6 +9,7 @@ from models.usuario import UsuarioModel
 args = reqparse.RequestParser()
 args.add_argument("login", type=str, required=True, help="Campo login obrigatório!")
 args.add_argument("senha", type=str, required=True, help="Campo senha obrigatório!")
+args.add_argument("ativado", type=bool, help="Campo ativado obrigatório!")
 
 
 class Usuario(Resource):
@@ -61,6 +62,7 @@ class UsuarioRegistro(Resource):
             return {"message": "Login {} já existe!".format(dados["login"])}
 
         usuario = UsuarioModel(**dados)
+        usuario.ativado = False
         usuario.save_usuario()
         return {"message": "Cadastro realizado com sucesso!"}, 201
 
@@ -76,9 +78,10 @@ class UsuarioLogin(Resource):
         usuario = UsuarioModel.find_by_login(dados["login"])
 
         if usuario and safe_str_cmp(usuario.senha, dados["senha"]):
-            token = create_access_token(identity=usuario.usuario_id)
-            return {"access_token": token}, 200
-
+            if usuario.ativado:
+                token = create_access_token(identity=usuario.usuario_id)
+                return {"access_token": token}, 200
+            return {"message": "Email não confirmado!"}, 400
         return {"message": "Login ou senha incorreto!"}, 401
 
 
@@ -92,3 +95,22 @@ class UsuarioLogout(Resource):
         BLACKLIST.add(jwt_id)
 
         return {"message": "Logout realizado com sucesso!"}, 200
+
+
+class UsuarioConfirmar(Resource):
+    """UsuarioConfirmar class"""
+
+    @classmethod
+    def get(cls, usuario_id):
+        """Método responsável por confirmar um usuário
+
+        Args:
+            usuario_id (string): ID do usuário
+        """
+        usuario = UsuarioModel.find_usuario(usuario_id)
+        if not usuario:
+            return {"message": "Usuário {} não encontrado!".format(usuario_id)}, 404
+
+        usuario.ativado = True
+        usuario.save_usuario()
+        return {"message": "Usuário confirmado com sucesso!"}, 200
