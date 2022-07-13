@@ -1,3 +1,4 @@
+import traceback
 from flask_jwt_extended import create_access_token
 from werkzeug.security import safe_str_cmp
 from flask_jwt_extended import jwt_required, get_jwt
@@ -9,6 +10,7 @@ from models.usuario import UsuarioModel
 args = reqparse.RequestParser()
 args.add_argument("login", type=str, required=True, help="Campo login obrigatório!")
 args.add_argument("senha", type=str, required=True, help="Campo senha obrigatório!")
+args.add_argument("email", type=str)
 args.add_argument("ativado", type=bool, help="Campo ativado obrigatório!")
 
 
@@ -56,6 +58,11 @@ class UsuarioRegistro(Resource):
     def post(self):
         """Método responsável por cadastrar um novo usuário"""
         dados = args.parse_args()
+        if not dados.get("email") or dados.get("email") is None:
+            return {"message": "Campo email obrigatório!"}, 400
+
+        if UsuarioModel.find_by_email(dados.get("email")):
+            return {"message": "Email já está em utilização!"}, 400
 
         # valida de ja existe o usuário
         if UsuarioModel.find_by_login(dados["login"]):
@@ -63,7 +70,13 @@ class UsuarioRegistro(Resource):
 
         usuario = UsuarioModel(**dados)
         usuario.ativado = False
-        usuario.save_usuario()
+        try:
+            usuario.save_usuario()
+            usuario.send_confirmation_email()
+        except:
+            usuario.delete_usuario()
+            traceback.print_exc()  # printa o erro no console
+            return {"message": "Internal Server Error!"}, 500
         return {"message": "Cadastro realizado com sucesso!"}, 201
 
 
