@@ -5,7 +5,7 @@ from requests import post
 MAILGUN_DOMAIN = "sandboxad628da248a0490fafb8580524fb3c8e.mailgun.org"
 MAILGUN_API_KEY = "5d222a0eb063b1af857d4ebd6d918f9b-62916a6c-6cf37cd3"
 FROM_TITLE = "NO-REPLY"
-FROM_EMAIL = "no-reply@schulz.net.br"
+FROM_EMAIL = "sandboxad628da248a0490fafb8580524fb3c8e.mailgun.org"
 
 
 class UsuarioModel(banco.Model):
@@ -109,9 +109,9 @@ class UsuarioModel(banco.Model):
                     link
                 ),
                 "html": '<html><p>\
-                Confirme seu cadastro clicando no seguinte link: <a href="{}">\
-                CONFIRMAR EMAIL</a>\
-                </p></html>'.format(
+                    Confirme seu cadastro clicando no seguinte link: <a href="{}">\
+                    CONFIRMAR EMAIL</a>\
+                    </p></html>'.format(
                     link
                 ),
             },
