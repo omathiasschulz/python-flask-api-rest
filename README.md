@@ -1,33 +1,37 @@
 # python-flask-api-rest
 
-O que é uma API RESTful?
+API RESTful para cadastro de Hotéis com login de usuários e autenticação.
 
-Deferença entre API E WebService?
+Esse projeto utiliza como base para construção o microframework `Flask` e foi realizado com base no curso da Udemy [REST APIs com Python e Flask](https://www.udemy.com/course/rest-apis-com-python-e-flask/)
 
-https://www.udemy.com/course/rest-apis-com-python-e-flask/
+## Rodar a aplicação
 
-Utilizando Python na versão 3.8.10
+**Obs:** É necessário possui o Python na versão 3.8.10.
 
-Criar um ambiente virtual:
+Criar um ambiente virtual chamado `venv`:
 
+```bash
 virtualenv venv
+```
 
 Ativar o ambiente virtual:
 
+```bash
 source venv/bin/activate
+```
 
-pip freeze > requirements.txt
+Instalar as dependências da aplicação:
 
+```bash
 pip install -r requirements.txt
+```
 
-pip install Flask
+Rodar a aplicação localmente:
 
-pip install Flask-Restful
-
-Lista bibliotecas instaladas:
-
-pip freeze
-
-Rodar a aplicação:
-
+```bash
 python app.py
+```
+
+## Testar a aplicação
+
+Para visualizar todas as rotas existentes nessa API e testar ela você pode importar no Insomnia o arquivo `sample/insomnia.json`.
