@@ -22,6 +22,14 @@ api = Api(app)
 jwt = JWTManager(app)
 
 
+@app.route("/")
+def index():
+    return (
+        jsonify({"message": "Olá, bem vindo!"}),
+        200,
+    )
+
+
 @app.before_first_request
 def cria_banco():
     """Inicia o banco de dados no primeiro request"""
